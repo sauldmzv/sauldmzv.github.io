@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'OldNewspaper';
+      src: url('OldNewspaperTypes.ttf') format('truetype');
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+    html, body {
+      width: 100%;
+      background: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .layout {
+      position: relative;
+      width: 100vw;
+      min-height: 100vh;
+      background: #ffffff;
+    }
+
+    /* ── Binder: overlay on the left, tiled down the full content height ──
+       Absolute so it never inflates the page height. ── */
+    .binder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 8.33vw;
+      height: 100%;
+      overflow: hidden;
+    }
+    .binder img {
+      width: 100%;
+      height: 100vh;        /* one binder copy per screen */
+      object-fit: cover;
+      object-position: left center;
+      display: block;
+    }
+
+    /* ── Right-hand page column (sits to the right of the binder) ── */
+    .main {
+      position: relative;
+      margin-left: 8.33vw;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Hero (the ID-record screen) ── */
+    .content {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ══════════════════════════════════════════════════
+       ARCHIVES section
+       ══════════════════════════════════════════════════ */
+    .archives {
+      position: relative;
+      width: 100%;
+      background: #ffffff;
+      padding: 11vh 7vw 11vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+    /* same gritty grain over the archives */
+    .archives::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.9;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+
+    .archives-title {
+      position: relative;
+      font-family: 'OldNewspaper', serif;
+      font-size: 6vh;
+      letter-spacing: 0.22em;
+      color: #15151a;
+      margin-bottom: 1.4vh;
+    }
+    .archives-sub {
+      position: relative;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.5vh;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 7vh;
+    }
+    .archives-rule {
+      position: relative;
+      width: 38vw;
+      height: 2px;
+      background: #15151a;
+      opacity: 0.4;
+      margin-bottom: 7vh;
+    }
+
+    /* ── the airport tray that holds the polaroids ── */
+    .archives-tray {
+      position: relative;
+      width: 90vw;
+      aspect-ratio: 1165 / 898;
+      background: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      padding: 6% 10% 7%;
+    }
+    /* tray image — PNG has transparent corners so it sits cleanly on white */
+    .archives-tray::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: url("airportrace.png") center / 100% 100% no-repeat;
+    }
+    /* cast shadow: soft oval below the tray, tied to the clipped shape */
+    .archives-tray::after {
+      content: '';
+      position: absolute;
+      bottom: -1.5%;
+      left: 10%;
+      width: 80%;
+      height: 4%;
+      background: rgba(0,0,0,0.20);
+      border-radius: 50%;
+      filter: blur(16px);
+      z-index: -1;
+    }
+    /* rows sit above the ::before image layer */
+    .tray-row { position: relative; z-index: 1; }
+    .tray-row {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2vw;
+      width: 100%;
+    }
+
+    /* ── Distressed white instant photo — 5:3 landscape window ── */
+    .polaroid {
+      position: relative;
+      flex: 0 0 auto;
+      width: 21vw;
+      transition: transform 0.28s cubic-bezier(.2,.8,.3,1), z-index 0s;
+    }
+    /* the paper card surface (used as a face on both sides) */
+    .paper {
+      position: relative;
+      padding: 0.9vw 0.9vw 3.4vw;
+      border-radius: 3px;
+      background-color: #ffffff;
+      box-shadow:
+        0 1px 3px rgba(0,0,0,0.40),          /* contact shadow — lies flat on tray */
+        0 6px 14px rgba(0,0,0,0.22),
+        0 18px 36px rgba(0,0,0,0.16),
+        inset 0 0 30px rgba(60,60,65,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+    /* gentle hover lift for non-flipping cards */
+    /* rugged paper: embossed crumple relief (blended in) + fine fiber grit */
+    .paper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: 3px;
+      pointer-events: none;
+      opacity: 0.75;
+      mix-blend-mode: multiply;
+      background-repeat: repeat, repeat;
+      background-size: 340px 340px, 120px 120px;
+      background-image:
+        /* crumpled-paper relief via diffuse lighting */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.022 0.028' numOctaves='5' seed='8' result='n'/%3E%3CfeDiffuseLighting in='n' lighting-color='white' surfaceScale='2.4' diffuseConstant='1.1'%3E%3CfeDistantLight azimuth='235' elevation='50'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='340' height='340' filter='url(%23p)'/%3E%3C/svg%3E"),
+        /* fine paper fiber grain */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23f)' opacity='0.18'/%3E%3C/svg%3E");
+    }
+    /* a couple of faint folds/creases */
+    .paper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: 3px;
+      pointer-events: none;
+      opacity: 0.6;
+      mix-blend-mode: multiply;
+      background-image:
+        linear-gradient(105deg, transparent 26%, rgba(120,120,128,0.10) 27%, transparent 28%),
+        linear-gradient(72deg,  transparent 63%, rgba(120,120,128,0.09) 64%, transparent 65%),
+        linear-gradient(150deg, transparent 48%, rgba(120,120,128,0.07) 49%, transparent 50%);
+    }
+    /* ── masking-tape strip holding each photo ── */
+    .tape {
+      position: absolute;
+      top: -0.55vw;
+      left: 50%;
+      width: 5.2vw;
+      height: 1.15vw;
+      z-index: 6;
+      transform: translateX(-50%) rotate(0deg);
+      border-radius: 1px;
+      /* warm, slightly translucent tape body */
+      background-color: rgba(228, 210, 168, 0.72);
+      /* paper-fiber grain baked in */
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='40'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.3' numOctaves='3' seed='12'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='40' filter='url(%23t)' opacity='0.22'/%3E%3C/svg%3E");
+      /* lift the tape off the surface */
+      box-shadow:
+        0 2px 5px rgba(0,0,0,0.22),
+        0 1px 2px rgba(0,0,0,0.14),
+        inset 0 1px 0 rgba(255,255,255,0.35);
+      /* torn-edge softness on the short sides */
+      -webkit-mask-image:
+        linear-gradient(to right,
+          rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.88) 6%,
+          rgba(0,0,0,1) 14%, rgba(0,0,0,1) 86%,
+          rgba(0,0,0,0.88) 94%, rgba(0,0,0,0.5) 100%);
+      mask-image:
+        linear-gradient(to right,
+          rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.88) 6%,
+          rgba(0,0,0,1) 14%, rgba(0,0,0,1) 86%,
+          rgba(0,0,0,0.88) 94%, rgba(0,0,0,0.5) 100%);
+    }
+
+    /* each tape piece has a slightly different angle so they feel hand-applied */
+    .tray-row:nth-child(1) .polaroid:nth-child(1) .tape { transform: translateX(-50%) rotate(-2.2deg); }
+    .tray-row:nth-child(1) .polaroid:nth-child(2) .tape { transform: translateX(-50%) rotate(1.5deg);  }
+    .tray-row:nth-child(1) .polaroid:nth-child(3) .tape { transform: translateX(-50%) rotate(-0.8deg); }
+    .tray-row:nth-child(2) .polaroid:nth-child(1) .tape { transform: translateX(-50%) rotate(1.8deg);  }
+    .tray-row:nth-child(2) .polaroid:nth-child(2) .tape { transform: translateX(-50%) rotate(-1.4deg); }
+    .tray-row:nth-child(2) .polaroid:nth-child(3) .tape { transform: translateX(-50%) rotate(0.6deg);  }
+
+    /* polaroids sit at slightly different angles — like they were placed, not stacked */
+    .tray-row:nth-child(1) .polaroid:nth-child(1) { transform: rotate(-2.4deg); }
+    .tray-row:nth-child(1) .polaroid:nth-child(2) { transform: rotate(0.9deg);  }
+    .tray-row:nth-child(1) .polaroid:nth-child(3) { transform: rotate(-1.1deg); }
+    .tray-row:nth-child(2) .polaroid:nth-child(1) { transform: rotate(1.7deg);  }
+    .tray-row:nth-child(2) .polaroid:nth-child(2) { transform: rotate(-2deg);   }
+    .tray-row:nth-child(2) .polaroid:nth-child(3) { transform: rotate(1.2deg);  }
+
+    /* hover: straighten + lift off the tray */
+    .polaroid:hover {
+      transform: rotate(0deg) translateY(-0.8vh) scale(1.03) !important;
+      z-index: 10;
+    }
+
+    /* ── locked polaroids ── */
+    .polaroid.locked .photo span { display: none; }
+    .polaroid.locked .photo img  { filter: blur(7px) brightness(0.75); }
+    .polaroid.locked .caption    { filter: blur(4px); user-select: none; }
+    .polaroid.locked .photo::after {
+      content: '?';
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 24, 18, 0.52);
+      font-family: 'OldNewspaper', serif;
+      font-size: 3.8vh;
+      color: rgba(255,255,255,0.70);
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+
+    /* the photo window — 5:3 landscape */
+    .paper .photo {
+      position: relative;
+      z-index: 2;                 /* above the chrome streak */
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border: 1px solid rgba(70,80,88,0.5);
+      /* faded vintage emulsion: warm tones + vignette */
+      background:
+        radial-gradient(120% 120% at 50% 40%, rgba(0,0,0,0) 55%, rgba(60,40,20,0.34) 100%),
+        linear-gradient(160deg, #cdbfa3 0%, #b9a888 45%, #9d8b6c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 22px rgba(50,32,15,0.35);
+    }
+    /* film grain over the photo */
+    .paper .photo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='0.12'/%3E%3C/svg%3E");
+    }
+    .paper .photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      filter: sepia(0.35) contrast(0.95) brightness(1.02);
+    }
+    .paper .photo span {
+      position: relative;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.2vh;
+      letter-spacing: 0.22em;
+      color: rgba(60,42,22,0.5);
+      text-transform: uppercase;
+    }
+
+    /* ── video window (first polaroid): clean, no sepia/emulsion ── */
+    .paper .photo.video {
+      background: #000;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .paper .photo.video::before { display: none; }   /* no film grain */
+    .paper .photo.video img {
+      filter: none;                                       /* no sepia */
+    }
+    .video-facade {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .video-facade img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .play-btn {
+      position: relative;
+      z-index: 2;
+      width: 22%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .play-btn::before {
+      content: '';
+      border-style: solid;
+      border-width: 0.9vh 0 0.9vh 1.5vh;
+      border-color: transparent transparent transparent #fff;
+      margin-left: 0.3vh;
+    }
+    .paper .photo.video:hover .play-btn {
+      background: #cc0000;
+      transform: scale(1.08);
+    }
+    .paper .photo.video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
+    /* small "i" info tab on the photo */
+    .info-btn {
+      position: absolute;
+      top: 0.6vh; right: 0.6vh;
+      z-index: 4;
+      width: 2.4vh; height: 2.4vh;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.4vh;
+      line-height: 2.4vh;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .info-btn:hover { background: rgba(0,0,0,0.8); }
+
+    /* note that slides over the photo */
+    .photo-note {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: rgba(252,250,244,0.97);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.6vh;
+      padding: 1.6vh 2vh;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .photo.show-note .photo-note { opacity: 1; pointer-events: auto; }
+    .paper .photo .photo-note .role {
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.15vh;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #8a7f6e;
+    }
+    .paper .photo .photo-note .desc {
+      font-family: 'Caveat', cursive;
+      font-weight: 500;
+      font-size: 2.4vh;
+      line-height: 1.25;
+      letter-spacing: normal;
+      text-transform: none;
+      color: #1f3fa0;
+    }
+
+    /* handwritten caption on the thick bottom band */
+    .polaroid .caption {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 1vw;
+      z-index: 3;
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      font-size: 1.7vw;
+      color: #34527e;
+      text-align: center;
+      line-height: 1;
+    }
+
+    /* ── Row 1: expanding handwritten caption note ── */
+    .cap-note {
+      display: block;
+      font-family: 'Caveat', cursive;
+      font-weight: 500;
+      font-size: 1.9vh;
+      line-height: 1.2;
+      color: #1f3fa0;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.35s ease;
+    }
+    .polaroid:hover .cap-note {
+      max-height: 8vh;
+      opacity: 1;
+      margin-top: 0.6vh;
+    }
+
+    /* ── Row 2: clickable lightbox polaroids ── */
+    .polaroid.expandable .paper { cursor: pointer; }
+    .polaroid.locked .paper { cursor: default; }
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20,20,24,0.55);
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .lightbox.open { opacity: 1; pointer-events: auto; }
+    .lb-card {
+      width: min(70vw, 92vh);
+      background: #fff;
+      border-radius: 6px;
+      padding: 2.2vh 2.2vh 3vh;
+      box-shadow: 0 40px 90px rgba(0,0,0,0.5);
+      transform: scale(0.9) translateY(2vh);
+      transition: transform 0.3s cubic-bezier(.2,.8,.3,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .lightbox.open .lb-card { transform: none; }
+    .lb-photo {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background:
+        radial-gradient(120% 120% at 50% 40%, rgba(0,0,0,0) 55%, rgba(60,40,20,0.34) 100%),
+        linear-gradient(160deg, #cdbfa3 0%, #b9a888 45%, #9d8b6c 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.6vh; letter-spacing: 0.2em; color: rgba(60,42,22,0.5);
+      text-transform: uppercase;
+      border: 1px solid rgba(70,80,88,0.4);
+    }
+    .lb-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .lb-photo iframe { width: 100%; height: 100%; border: 0; }
+    .lb-photo iframe { width: 100%; height: 100%; border: 0; }
+    .lb-title {
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      font-size: 4vh;
+      color: #34527e;
+      margin: 1.6vh 0 0.3vh;
+    }
+    .lb-role {
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.3vh;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #8a7f6e;
+      margin-bottom: 1.4vh;
+    }
+    .lb-desc {
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.7vh;
+      line-height: 1.7;
+      color: #2a2a2e;
+    }
+    .lb-close {
+      position: absolute;
+      top: 3vh; right: 3vw;
+      width: 5vh; height: 5vh;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      font-family: 'OldNewspaper', serif;
+      font-size: 2.4vh;
+      color: #1f1f1f;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .lb-close:hover { background: #fff; }
+
+    /* ══════════════════════════════════════════════════
+       CONTACT — "Let's work together"
+       ══════════════════════════════════════════════════ */
+    .contact {
+      position: relative;
+      width: 100%;
+      background: #ffffff;
+      color: #15151a;
+      padding: 13vh 7vw 14vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .contact-eyebrow {
+      position: relative;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.5vh;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 3vh;
+    }
+    .contact-title {
+      position: relative;
+      font-family: 'OldNewspaper', serif;
+      font-size: 8vh;
+      line-height: 1.02;
+      letter-spacing: 0.04em;
+      text-align: center;
+      color: #15151a;
+      margin-bottom: 6vh;
+    }
+    .contact-links {
+      position: relative;
+      display: flex;
+      gap: 2.5vh;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+    }
+    .contact-link {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 1.4vh;
+      font-family: 'OldNewspaper', serif;
+      font-size: 2.6vh;
+      letter-spacing: 0.1em;
+      color: #15151a;
+      text-decoration: none;
+      padding: 1.4vh 2.8vh;
+      border: 0.2vh solid #15151a;
+      border-radius: 4px;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+    .contact-link svg {
+      width: 3vh;
+      height: 3vh;
+      flex-shrink: 0;
+      fill: currentColor;
+    }
+    .contact-link:hover {
+      background: #15151a;
+      color: #fff;
+      transform: translateY(-0.4vh);
+    }
+    .contact-foot {
+      position: relative;
+      margin-top: 7vh;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.3vh;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(20,20,26,0.4);
+    }
+
+    /* ══════════════════════════════════════════════════
+       MAX PAYNE — noir crime-file props (behind the card)
+       Grunge distress mask makes every stamp look worn/inked.
+       ══════════════════════════════════════════════════ */
+    .props { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .props > * { position: absolute; }
+
+    /* shared distress mask: eats away parts of each stamp so it looks pressed */
+    .grunge {
+      -webkit-mask:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045 0.05' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.7 1.25'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)'/%3E%3C/svg%3E");
+      -webkit-mask-size: 180px 180px;
+      mask:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045 0.05' numOctaves='4' seed='7'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.7 1.25'/%3E%3C/filter%3E%3Crect width='220' height='220'/%3E%3C/svg%3E");
+      mask-size: 180px 180px;
+    }
+
+    /* dark vignette in the corners — noir mood without darkening the whole page */
+    .props .vignette {
+      inset: 0;
+      background:
+        radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0) 58%, rgba(10,10,14,0.10) 100%);
+    }
+
+    /* gritty paper grain */
+    .props .grain {
+      inset: 0;
+      opacity: 0.9;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+
+    /* ── big blood-red CLASSIFIED stamp (top-left) ── */
+    .props .stamp-red {
+      top: 11%;
+      left: 7%;
+      transform: rotate(-13deg);
+      border: 0.7vh solid #8a0e12;
+      border-radius: 4px;
+      padding: 1.1vh 2.4vh;
+      font-family: 'OldNewspaper', serif;
+      font-weight: 700;
+      font-size: 3.2vh;
+      letter-spacing: 0.12em;
+      color: #8a0e12;
+      text-align: center;
+      line-height: 1.05;
+      opacity: 0.82;
+    }
+    .props .stamp-red small {
+      display: block;
+      font-size: 1.15vh;
+      letter-spacing: 0.42em;
+      margin-top: 0.4vh;
+    }
+
+    /* ── black CASE FILE stamp (lower-left) ── */
+    .props .stamp-black {
+      bottom: 16%;
+      left: 9%;
+      transform: rotate(4deg);
+      border: 0.55vh solid #15151a;
+      padding: 0.9vh 2vh;
+      font-family: 'OldNewspaper', serif;
+      font-weight: 700;
+      font-size: 2.2vh;
+      letter-spacing: 0.16em;
+      color: #15151a;
+      text-align: center;
+      line-height: 1.1;
+      opacity: 0.7;
+    }
+    .props .stamp-black small {
+      display: block;
+      font-size: 1.05vh;
+      letter-spacing: 0.3em;
+      margin-top: 0.3vh;
+    }
+
+    /* ── circular EVIDENCE stamp (top-right area) ── */
+    .props .stamp-circle {
+      top: 9%;
+      right: 13%;
+      width: 13vh;
+      height: 13vh;
+      border-radius: 50%;
+      border: 0.55vh solid #8a0e12;
+      transform: rotate(11deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8a0e12;
+      opacity: 0.72;
+    }
+    .props .stamp-circle::before {
+      content: '';
+      position: absolute;
+      inset: 1.1vh;
+      border-radius: 50%;
+      border: 0.18vh solid #8a0e12;
+    }
+    .props .stamp-circle span {
+      font-family: 'OldNewspaper', serif;
+      font-weight: 700;
+      font-size: 1.9vh;
+      letter-spacing: 0.1em;
+      text-align: center;
+      line-height: 1.15;
+    }
+    .props .stamp-circle span small { display:block; font-size: 0.85vh; letter-spacing: 0.28em; }
+
+    /* ── redacted bars ── */
+    .props .redact {
+      height: 2.3vh;
+      background: #111114;
+      opacity: 0.82;
+    }
+    .props .redact.b1 { top: 40%; left: 6%;  width: 17vh; transform: rotate(-2deg); }
+    .props .redact.b2 { top: 45%; left: 6%;  width: 11vh; }
+    .props .redact.b3 { bottom: 30%; right: 8%; width: 14vh; transform: rotate(1.5deg); }
+
+    /* ── dark coffee/whiskey stain ── */
+    .props .stain {
+      bottom: 8%; left: 14%;
+      width: 17vh; height: 17vh;
+      border-radius: 50%;
+      border: 0.4vh solid rgba(40, 26, 18, 0.16);
+      box-shadow: inset 0 0 0 0.9vh rgba(40, 26, 18, 0.05);
+    }
+
+    /* ── faint typewriter case refs (stark black) ── */
+    .props .ref {
+      font-family: 'OldNewspaper', serif;
+      color: rgba(20,20,24,0.20);
+      letter-spacing: 0.14em;
+      font-size: 1.35vh;
+    }
+    .props .ref.r1 { top: 6%;  left: 45%; }
+    .props .ref.r2 { bottom: 6%; left: 12%; }
+    .props .ref.r3 { top: 52%; right: 3.5%; transform: rotate(-90deg); transform-origin: right; }
+
+    /* ── Card ──
+       image is 271 x 175  →  aspect ratio 1.5486
+       --ch drives every internal size, so it always fits.
+    ── */
+    .card-wrap {
+      --ch: 56vh;                       /* card height */
+      --cw: calc(var(--ch) * (271 / 175));
+      --radius: calc(var(--ch) * 0.05);
+      /* anchored on the page (scrolls with it), spawns at the hero centre */
+      position: absolute;
+      top: 50vh;
+      left: 50%;
+      z-index: 1000;
+      height: var(--ch);
+      width: var(--cw);
+      perspective: 1600px;
+      /* centered + drag offset (set by JS) */
+      transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px)));
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+    .card-wrap.dragging { cursor: grabbing; }
+
+    /* flip mechanism */
+    .card-flip {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transition: transform 0.7s cubic-bezier(.2,.7,.2,1);
+    }
+    .card-wrap.flipped .card-flip { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: #ffffff;
+      box-shadow:
+        0 30px 60px rgba(0,0,0,0.25),
+        0 12px 24px rgba(0,0,0,0.16),
+        0 4px 8px rgba(0,0,0,0.10);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+    }
+    .card-back { transform: rotateY(180deg); }
+
+    /* ── postcard (card back) ── */
+    .postcard {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      padding: calc(var(--ch) * 0.08);
+      gap: calc(var(--ch) * 0.06);
+    }
+    .pc-left {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-right: calc(var(--ch) * 0.04);
+    }
+    .pc-msg {
+      font-family: 'Caveat', cursive;
+      font-weight: 500;
+      font-size: calc(var(--ch) * 0.05);
+      line-height: 1.3;
+      color: #1f3fa0;
+    }
+    .pc-sign {
+      align-self: flex-end;
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      font-size: calc(var(--ch) * 0.07);
+      color: #1f3fa0;
+    }
+    .pc-right {
+      flex: 0.9;
+      border-left: 1.5px dashed #c7c7c7;
+      padding-left: calc(var(--ch) * 0.06);
+      display: flex;
+      flex-direction: column;
+    }
+    .pc-stamp {
+      align-self: flex-end;
+      width: calc(var(--ch) * 0.16);
+      height: calc(var(--ch) * 0.2);
+      border: 1.5px solid #cfcfcf;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'OldNewspaper', serif;
+      font-size: calc(var(--ch) * 0.026);
+      letter-spacing: 0.12em;
+      color: #b0b0b0;
+      line-height: 1.3;
+    }
+    .pc-stars {
+      display: flex;
+      justify-content: center;
+      gap: calc(var(--ch) * 0.03);
+      margin: calc(var(--ch) * 0.02) 0;
+    }
+    .pc-stars span {
+      font-size: calc(var(--ch) * 0.045);
+      line-height: 1;
+      color: #2a2a2a;
+      /* faded, uneven ink */
+      opacity: 0.62;
+      /* distress: punch holes in the glyph with fractal noise */
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' seed='5'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.4 1.25'/%3E%3C/filter%3E%3Crect width='40' height='40' filter='url(%23d)'/%3E%3C/svg%3E");
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='3' seed='5'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.4 1.25'/%3E%3C/filter%3E%3Crect width='40' height='40' filter='url(%23d)'/%3E%3C/svg%3E");
+      -webkit-mask-size: cover;
+      mask-size: cover;
+    }
+    .pc-stars span:nth-child(1) { transform: rotate(-9deg); opacity: 0.55; }
+    .pc-stars span:nth-child(2) { transform: rotate(4deg); opacity: 0.7; }
+    .pc-stars span:nth-child(3) { transform: rotate(-3deg) translateY(0.3vh); opacity: 0.5; }
+
+    .pc-addr {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--ch) * 0.055);
+    }
+    .pc-addr span {
+      display: block;
+      border-bottom: 1.5px solid #d2d2d2;
+      font-family: 'Caveat', cursive;
+      font-weight: 500;
+      font-size: calc(var(--ch) * 0.034);
+      white-space: nowrap;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      color: #1f3fa0;
+    }
+    .pc-addr span i {
+      font-style: normal;
+      color: #111;
+      font-family: serif;
+    }
+    .pc-flip-hint {
+      position: absolute;
+      bottom: calc(var(--ch) * 0.03);
+      left: calc(var(--ch) * 0.08);
+      font-family: 'OldNewspaper', serif;
+      font-size: calc(var(--ch) * 0.022);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c0c0c0;
+    }
+
+    /* ── scroll cue ── */
+    .scroll-cue {
+      position: absolute;
+      bottom: 4vh;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8vh;
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.3vh;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #6a6a6a;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      animation: cueBob 1.8s ease-in-out infinite;
+    }
+    .scroll-cue svg { width: 2.4vh; height: 2.4vh; stroke: #6a6a6a; fill: none; stroke-width: 2; }
+    .scroll-cue.hide { opacity: 0; }
+    @keyframes cueBob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(0.8vh); }
+    }
+
+    /* ── scroll reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(4vh);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.is-visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .scroll-cue { animation: none; }
+    }
+
+    /* ── music control ── */
+    .music-ctrl {
+      position: fixed;
+      bottom: 3vh;
+      right: 3vh;
+      z-index: 1500;
+      display: none;                 /* hidden until unlocked */
+      align-items: center;
+      gap: 1.4vh;
+    }
+    .music-ctrl.revealed { display: flex; }
+
+    /* ── password unlock (top-left) ── */
+    .pw {
+      position: fixed;
+      top: 2.2vh;
+      right: 1.4vw;
+      z-index: 1600;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.9vh;
+    }
+    .pw-btn {
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.9vh;
+      letter-spacing: 0.14em;
+      color: #1f1f1f;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .pw-btn:hover { text-decoration: underline; }
+    .pw-row { display: none; gap: 0.8vh; align-items: stretch; }
+    .pw.open .pw-row { display: flex; }
+    .pw-input {
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.5vh;
+      letter-spacing: 0.25em;
+      padding: 0.6vh 1vh;
+      width: 13vh;
+      border: 1px solid #1f1f1f;
+      background: #fff;
+      color: #1f1f1f;
+      outline: none;
+    }
+    .pw-confirm {
+      font-family: 'OldNewspaper', serif;
+      font-size: 1.4vh;
+      letter-spacing: 0.1em;
+      padding: 0.6vh 1.2vh;
+      border: 1px solid #1f1f1f;
+      background: #1f1f1f;
+      color: #fff;
+      cursor: pointer;
+    }
+    .pw-confirm:hover { background: #000; }
+    .vinyl {
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      margin-left: -7.5vh;
+      margin-bottom: -1.5vh;
+      width: 15vh;
+      height: 15vh;
+      pointer-events: none;
+      border-radius: 50%;
+      overflow: hidden;                   /* clip to a clean circle */
+      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+    }
+    .vinyl img {
+      width: 116%;                        /* zoom so the black rim spills outside the clip */
+      height: 116%;
+      margin: -8%;
+      display: block;
+      transform-origin: center;
+    }
+    .music-ctrl.spin .vinyl img { animation: vinylSpin 4s linear infinite; }
+    @keyframes vinylSpin { to { transform: rotate(360deg); } }
+    .vol {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12vh;
+      height: 0.5vh;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      outline: none;
+      cursor: pointer;
+    }
+    .vol::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 1.8vh;
+      height: 1.8vh;
+      border-radius: 50%;
+      background: #1f1f1f;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .vol::-moz-range-thumb {
+      width: 1.8vh;
+      height: 1.8vh;
+      border-radius: 50%;
+      background: #1f1f1f;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .music-btn {
+      z-index: 1500;
+      width: 6vh;
+      height: 6vh;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .music-btn:hover { transform: scale(1.08); box-shadow: 0 10px 22px rgba(0,0,0,0.25); }
+    .music-btn:active { transform: scale(0.95); }
+    .music-btn svg { width: 2.6vh; height: 2.6vh; fill: #1f1f1f; }
+    /* show the right icon for the current state */
+    .music-btn .ic-pause { display: none; }
+    .music-btn[data-state="playing"] .ic-play  { display: none; }
+    .music-btn[data-state="playing"] .ic-pause { display: block; }
+
+    /* ── loading screen ── */
+    body.is-loading { background: #07070b; }   /* no white flash before the loader paints */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #07070b;            /* dark splash so the glowing star blends */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s ease;
+    }
+    #loader.hide { opacity: 0; pointer-events: none; }
+
+    .runes {
+      display: flex;
+      gap: 4vh;
+      font-family: 'Segoe UI Symbol', 'Noto Sans Runic', 'Apple Symbols', serif;
+      font-size: 9vh;
+      line-height: 1;
+      color: #eaf4ff;
+    }
+    .runes span {
+      opacity: 0.3;
+      animation: runeGlow 1.6s ease-in-out infinite;
+      text-shadow:
+        0 0 6px rgba(150,210,255,0.7),
+        0 0 14px rgba(120,180,255,0.5);
+    }
+    .runes span:nth-child(1) { animation-delay: 0s; }
+    .runes span:nth-child(2) { animation-delay: 0.18s; }
+    .runes span:nth-child(3) { animation-delay: 0.36s; }
+    .runes span:nth-child(4) { animation-delay: 0.54s; }
+    .runes span:nth-child(5) { animation-delay: 0.72s; }
+    @keyframes runeGlow {
+      0%, 100% {
+        opacity: 0.28;
+        text-shadow: 0 0 5px rgba(150,210,255,0.5);
+      }
+      50% {
+        opacity: 1;
+        text-shadow:
+          0 0 10px rgba(180,225,255,0.95),
+          0 0 26px rgba(120,180,255,0.8),
+          0 0 48px rgba(90,150,255,0.5);
+      }
+    }
+
+    /* ── draggable Nokia (glides with momentum) ── */
+    .nokia {
+      position: absolute;
+      top: 52vh;
+      left: 76%;
+      width: 14vh;
+      z-index: 1001;
+      transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px)));
+      cursor: grab;
+      user-select: none;
+      -webkit-user-drag: none;
+      touch-action: none;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,0.30));
+      will-change: transform;
+    }
+    .nokia.dragging { cursor: grabbing; }
+
+    /* content overlay, inset to land on the white card face */
+    .card-body {
+      position: absolute;
+      inset: 0;
+      padding: calc(var(--ch) * 0.085) calc(var(--ch) * 0.07);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Title ── */
+    .card-title {
+      font-family: 'OldNewspaper', serif;
+      font-size: calc(var(--ch) * 0.058);
+      letter-spacing: 0.2em;
+      text-align: center;
+      color: #1f1f1f;
+      /* sits left of the photo, centred over the form area */
+      padding-right: calc(var(--cw) * 0.20);
+      margin-bottom: calc(var(--ch) * 0.05);
+    }
+
+    /* ── Photo (absolute, top-right) ── */
+    .card-photo {
+      position: absolute;
+      top: calc(var(--ch) * 0.075);
+      right: calc(var(--ch) * 0.075);
+      width: calc(var(--cw) * 0.22);
+      aspect-ratio: 3 / 4;
+      background: #d2d1cb;
+      border: 1px solid #b8b8b3;
+      overflow: hidden;
+    }
+    .card-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      filter: grayscale(100%);
+    }
+    .card-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'OldNewspaper', serif;
+      font-size: calc(var(--ch) * 0.02);
+      letter-spacing: 0.08em;
+      color: #9a9a95;
+      text-align: center;
+    }
+
+    /* ── Fields column ── */
+    .fields {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .field { display: flex; flex-direction: column; }
+
+    /* name & country leave room for the photo on the right */
+    .field.short { padding-right: calc(var(--cw) * 0.30); }
+
+    .field-label {
+      font-family: 'OldNewspaper', serif;
+      font-size: calc(var(--ch) * 0.026);
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: #5a5a5a;
+      margin-bottom: calc(var(--ch) * 0.012);
+    }
+
+    .field-line {
+      border-bottom: 1.5px solid #c2c2bd;
+      padding-bottom: calc(var(--ch) * 0.004);
+    }
+    .field-line + .field-line { margin-top: calc(var(--ch) * 0.018); }
+
+    .ans {
+      font-family: 'Caveat', cursive;
+      font-weight: 500;
+      font-size: calc(var(--ch) * 0.052);
+      color: #1f3fa0;
+      line-height: 1.0;
+      display: inline-block;
+    }
+
+    /* ════════════════ MOBILE / PORTRAIT ════════════════ */
+    @media (max-width: 760px) {
+      .binder { width: 30px; }
+      .main { margin-left: 30px; }
+
+      /* ID card sized by width so it fits the screen */
+      .card-wrap { --ch: 58vw; top: 46vh; }
+
+      .archives { padding: 8vh 5vw 9vh; }
+      .archives-title { font-size: 8.5vw; letter-spacing: 0.1em; }
+      .archives-sub { font-size: 3.4vw; margin-bottom: 5vh; }
+      .archives-rule { width: 70vw; margin-bottom: 5vh; }
+
+      /* polaroids: one per row */
+      .archives-tray { width: 94vw; padding: 7% 9% 7%; }
+      .tray-row { flex-wrap: nowrap; gap: 4vw; }
+      .polaroid { width: 36vw; }
+      .polaroid .caption { font-size: 3vw; }
+      .clip { width: 9vw; height: calc(9vw * 355 / 415); top: -5vw; }
+
+      .contact { padding: 10vh 6vw 12vh; }
+      .contact-eyebrow { font-size: 3.4vw; }
+      .contact-title { font-size: 12vw; }
+      .contact-links { flex-direction: column; gap: 2.4vh; width: 100%; }
+      .contact-link { font-size: 5vw; justify-content: center; width: 82vw; letter-spacing: 0.06em; }
+      .contact-link svg { width: 6vw; height: 6vw; }
+      .contact-foot { font-size: 3vw; }
+
+      .nokia { width: 28vw; left: 70%; }
+      .music-ctrl { bottom: 2vh; right: 2vh; gap: 2.4vw; }
+      .vol { width: 26vw; }
+      .music-btn { width: 12vw; height: 12vw; }
+      .music-btn svg { width: 5.5vw; height: 5.5vw; }
+      .vinyl { width: 24vw; height: 24vw; margin-left: -12vw; }
+      .pw { top: 1.6vh; right: 3vw; }
+      .pw-btn { font-size: 3.4vw; }
+      .pw-input { font-size: 3vw; width: 32vw; letter-spacing: 0.2em; }
+      .pw-confirm { font-size: 3vw; }
+
+      .scroll-cue { font-size: 3vw; }
+      .runes { gap: 7vw; font-size: 12vw; }
+    }
+  </style>
+</head>
+<body class="is-loading">
+
+<!-- password unlock -->
+<div class="pw" id="pw">
+  <button class="pw-btn" id="pwBtn">password</button>
+  <div class="pw-row">
+    <input class="pw-input" id="pwInput" type="password" inputmode="numeric" placeholder="•••••" aria-label="password" />
+    <button class="pw-confirm" id="pwConfirm">enter</button>
+  </div>
+</div>
+
+<!-- background music -->
+<audio id="bgm" src="audio1.mp3" loop preload="auto"></audio>
+<div class="music-ctrl">
+  <span class="vinyl"><img src="vinyl.png" alt="" /></span>
+  <input id="vol" class="vol" type="range" min="0" max="1" step="0.001" value="0.002" aria-label="Volume" />
+  <button id="musicToggle" class="music-btn" aria-label="Play music" data-state="paused">
+    <svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg class="ic-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+</div>
+
+<!-- loading screen -->
+<div id="loader">
+  <div class="runes" aria-label="loading">
+    <span>ᚹ</span><span>ᚢ</span><span>ᛇ</span><span>ᚨ</span><span>ᚱ</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <div class="binder" id="binder">
+    <img src="chromedb.png" alt="" />
+  </div>
+
+  <div class="main">
+
+  <div class="content">
+    <div class="scroll-cue" id="scrollCue">
+      <span>Scroll</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </div>
+  </div><!-- /content -->
+
+  <!-- ID-record card (anchored on the page, draggable) -->
+  <div class="card-wrap">
+    <div class="card-flip">
+    <div class="card-face card-front">
+
+    <!-- photo -->
+    <div class="card-photo">
+      <img src="photoai.jpg" alt="" />
+    </div>
+
+    <div class="card-body">
+
+      <div class="card-title">FOR THE RECORD</div>
+
+      <div class="fields">
+
+        <div class="field short">
+          <span class="field-label">Name</span>
+          <div class="field-line"><span class="ans">Saul Danilo Martinez Zavala</span></div>
+        </div>
+
+        <div class="field short">
+          <span class="field-label">Country</span>
+          <div class="field-line"><span class="ans">Ecuador - Guayaquil</span></div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Tell us about your story</span>
+          <div class="field-line"><span class="ans">I am an Economics student that sometimes</span></div>
+          <div class="field-line"><span class="ans">has time to share his memories.</span></div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">What's your invisible luggage?</span>
+          <div class="field-line"><span class="ans">Curiosity about people, an eye for culture, and the</span></div>
+          <div class="field-line"><span class="ans">drive to turn every new city into something worth sharing.</span></div>
+        </div>
+
+      </div>
+
+    </div>
+    </div><!-- /card-front -->
+
+    <div class="card-face card-back">
+      <div class="postcard">
+        <div class="pc-left">
+          <p class="pc-msg">International marketing. Cross-cultural partnerships. Economics with a human lens.<br><br>I build strategies that open doors for universities, for brands, for people. I've worked across Europe and Asia, turned curiosity into real professional results, and I do it all while pursuing my degree.<br><br>I don't just study how the world works. I go out and move with it.</p>
+          <div class="pc-stars"><span>★</span><span>★</span><span>★</span></div>
+          <span class="pc-sign">— Saul</span>
+        </div>
+        <div class="pc-right">
+          <div class="pc-stamp">PAR<br>AVION</div>
+          <div class="pc-addr"><span>To: Whoever's reading this</span><span>From: everywhere, probably</span><span>Re: let's make something</span></div>
+        </div>
+      </div>
+      <span class="pc-flip-hint">click to flip back</span>
+    </div>
+
+    </div><!-- /card-flip -->
+  </div>
+
+  <!-- draggable Nokia that glides -->
+  <img src="Nokia.png" alt="" class="nokia" id="nokia" draggable="false" />
+
+  <!-- ══ ARCHIVES ══ -->
+  <section class="archives" id="archives">
+    <h2 class="archives-title">ARCHIVES</h2>
+    <p class="archives-sub">Selected Work</p>
+    <div class="archives-rule"></div>
+
+    <div class="archives-tray">
+
+      <div class="tray-row">
+        <div class="polaroid expandable"
+             data-title="Project 01"
+             data-role="Recorded · Edited · Scripted"
+             data-yt="YjRn-Q7uBrg"
+             data-desc="Wrote the script, filmed it, and cut the whole edit myself — a one-person production from first idea to final export.">
+          <div class="tape"></div>
+          <div class="paper">
+            <div class="photo">
+              <img src="https://img.youtube.com/vi/YjRn-Q7uBrg/maxresdefault.jpg" alt="" />
+            </div>
+            <div class="caption">Project 01</div>
+          </div>
+        </div>
+
+        <div class="polaroid expandable locked"
+             data-title="Project 02"
+             data-role="Art Direction · Color"
+             data-desc="A studio brand shoot where I handled art direction and the final color grade, giving the whole set a warm, consistent look.">
+          <div class="tape"></div>
+          <div class="paper">
+            <div class="photo"><span>Photo</span></div>
+            <div class="caption">Project 02</div>
+          </div>
+        </div>
+
+        <div class="polaroid expandable locked"
+             data-title="Project 03"
+             data-role="Travel · Editor"
+             data-desc="A travel diary cut for a regional tourism campaign — paced to music, color-matched across locations, and delivered in three aspect ratios.">
+          <div class="tape"></div>
+          <div class="paper">
+            <div class="photo"><span>Photo</span></div>
+            <div class="caption">Project 03</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tray-row">
+        <div class="polaroid expandable locked"
+             data-title="Project 04"
+             data-role="Strategy · Campaign Lead"
+             data-desc="Led a cross-cultural launch campaign for a European university fair in Asia. Built the messaging, coordinated three local teams, and delivered a 40% lift in qualified applications over the previous cycle.">
+          <div class="tape"></div>
+          <div class="paper">
+            <div class="photo"><span>Photo</span></div>
+            <div class="caption">Project 04</div>
+          </div>
+        </div>
+
+        <div class="polaroid expandable locked"
+             data-title="Project 05"
+             data-role="Producer · Editor"
+             data-desc="A short documentary following street vendors across three cities. Handled interviews, on-location sound, and a 6-minute edit that screened at a local film night.">
+          <div class="tape"></div>
+          <div class="paper">
+            <div class="photo"><span>Photo</span></div>
+            <div class="caption">Project 05</div>
+          </div>
+        </div>
+
+        <div class="polaroid expandable locked"
+             data-title="Project 06"
+             data-role="Research · Data Viz"
+             data-desc="An economics explainer turning trade data into a visual story. Built the charts, wrote the narration, and packaged it as a carousel that reached 50k+ views.">
+          <div class="tape"></div>
+          <div class="paper">
+            <div class="photo"><span>Photo</span></div>
+            <div class="caption">Project 06</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- project lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" type="button">✕</button>
+    <div class="lb-card">
+      <div class="lb-photo">Photo</div>
+      <div class="lb-title"></div>
+      <div class="lb-role"></div>
+      <p class="lb-desc"></p>
+    </div>
+  </div>
+
+  <!-- ══ CONTACT ══ -->
+  <section class="contact" id="contact">
+    <p class="contact-eyebrow">Get in touch</p>
+    <h2 class="contact-title">Let's work<br>together</h2>
+    <div class="contact-links">
+      <a class="contact-link" href="mailto:saul.dmvz@gmail.com">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm10 7L3.5 5.5h17L12 11zm0 2.2L3 7.3V18h18V7.3l-9 5.9z"/></svg>
+        saul.dmvz@gmail.com
+      </a>
+      <a class="contact-link" href="https://www.youtube.com/@saul_archives" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+        @saul_archives
+      </a>
+      <a class="contact-link" href="https://www.linkedin.com/in/saulmartinez02/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+        Saul Martinez
+      </a>
+    </div>
+    <p class="contact-foot">Saul Danilo Martinez Zavala · 2026</p>
+  </section>
+
+  </div><!-- /main -->
+
+</div>
+
+<script>
+  /* ── loading screen ── */
+  (function loader() {
+    const el = document.getElementById('loader');
+    if (!el) return;
+    const MIN = 2200;                 // keep the runes on screen at least this long
+    const start = performance.now();
+    function done() {
+      const wait = Math.max(0, MIN - (performance.now() - start));
+      setTimeout(() => {
+        el.classList.add('hide');
+        document.body.classList.remove('is-loading');
+        setTimeout(() => el.remove(), 650);
+      }, wait);
+    }
+    if (document.readyState === 'complete') done();
+    else window.addEventListener('load', done);
+  })();
+
+  /* ── background music + play/pause ── */
+  (function music() {
+    const audio = document.getElementById('bgm');
+    const btn = document.getElementById('musicToggle');
+    const vol = document.getElementById('vol');
+    if (!audio || !btn) return;
+    audio.volume = vol ? parseFloat(vol.value) : 0.5;
+    if (vol) vol.addEventListener('input', () => { audio.volume = parseFloat(vol.value); });
+
+    const ctrl = document.querySelector('.music-ctrl');
+    function setState(playing) {
+      btn.dataset.state = playing ? 'playing' : 'paused';
+      btn.setAttribute('aria-label', playing ? 'Pause music' : 'Play music');
+      if (ctrl) ctrl.classList.toggle('spin', playing);
+    }
+    btn.addEventListener('click', () => {
+      if (audio.paused) audio.play().catch(() => {});
+      else audio.pause();
+    });
+    audio.addEventListener('play', () => setState(true));
+    audio.addEventListener('pause', () => setState(false));
+
+    // ── password gate: reveals the player on "12345" ──
+    const pw = document.getElementById('pw');
+    const pwBtn = document.getElementById('pwBtn');
+    const pwInput = document.getElementById('pwInput');
+    const ctrl2 = document.querySelector('.music-ctrl');
+
+    pwBtn.addEventListener('click', () => {
+      pw.classList.toggle('open');
+      if (pw.classList.contains('open')) pwInput.focus();
+    });
+
+    const pwConfirm = document.getElementById('pwConfirm');
+    function tryUnlock() {
+      if (pwInput.value.trim() === '12345') {
+        ctrl2.classList.add('revealed');
+        pw.style.display = 'none';
+        audio.play().catch(() => {});
+      } else {
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    }
+    pwConfirm.addEventListener('click', tryUnlock);
+    pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+  })();
+
+  /* ── scroll reveal ── */
+  (function reveal() {
+    const items = document.querySelectorAll(
+      '.archives-title, .archives-sub, .archives-rule, .polaroid, ' +
+      '.contact-eyebrow, .contact-title, .contact-links, .contact-foot'
+    );
+    items.forEach((el) => el.classList.add('reveal'));
+    // stagger polaroids within each row
+    document.querySelectorAll('.tray-row').forEach((row) => {
+      row.querySelectorAll('.polaroid').forEach((p, i) => {
+        p.style.transitionDelay = (i * 0.12) + 's';
+      });
+    });
+    if (!('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.18 });
+    items.forEach((el) => io.observe(el));
+  })();
+
+  /* ── scroll cue: hide once the user scrolls ── */
+  (function scrollCue() {
+    const cue = document.getElementById('scrollCue');
+    if (!cue) return;
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 60) cue.classList.add('hide');
+      else cue.classList.remove('hide');
+    }, { passive: true });
+  })();
+
+  /* duplicate the binder rings down the full page height so it keeps flowing */
+  (function fillBinder() {
+    const binder = document.getElementById('binder');
+    const src = binder.querySelector('img').getAttribute('src');
+    function fit() {
+      const need = Math.ceil(document.documentElement.scrollHeight / window.innerHeight);
+      let have = binder.querySelectorAll('img').length;
+      while (have < need) {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        binder.appendChild(img);
+        have++;
+      }
+    }
+    fit();
+    window.addEventListener('resize', fit);
+  })();
+
+  /* ── lightbox for every polaroid (video or photo) ── */
+  (function lightbox() {
+    const lb = document.getElementById('lightbox');
+    if (!lb) return;
+    const titleEl = lb.querySelector('.lb-title');
+    const roleEl  = lb.querySelector('.lb-role');
+    const descEl  = lb.querySelector('.lb-desc');
+    const photoEl = lb.querySelector('.lb-photo');
+
+    function open(p) {
+      titleEl.textContent = p.dataset.title || '';
+      roleEl.textContent  = p.dataset.role || '';
+      descEl.textContent  = p.dataset.desc || '';
+      const yt = p.dataset.yt;
+      const img = p.querySelector('.photo img');
+      if (yt) {
+        photoEl.innerHTML =
+          '<iframe src="https://www.youtube.com/embed/' + yt +
+          '?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+      } else {
+        photoEl.innerHTML = img ? '<img src="' + img.src + '" alt="">' : 'Photo';
+      }
+      lb.classList.add('open');
+    }
+    function close() {
+      lb.classList.remove('open');
+      photoEl.innerHTML = '';   // stop any playing video
+    }
+
+    document.querySelectorAll('.polaroid.expandable').forEach((p) => {
+      p.querySelector('.paper').addEventListener('click', () => {
+        if (p.classList.contains('locked')) return;
+        open(p);
+      });
+    });
+    lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+    lb.querySelector('.lb-close').addEventListener('click', close);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  })();
+
+  /* ── drag the ID-record card ── */
+  (function dragCard() {
+    const card = document.querySelector('.card-wrap');
+    if (!card) return;
+    let dx = 0, dy = 0, startX = 0, startY = 0, dragging = false;
+    card.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      card.classList.add('dragging');
+      card.setPointerCapture(e.pointerId);
+    });
+    card.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      card.style.setProperty('--dx', (dx + e.clientX - startX) + 'px');
+      card.style.setProperty('--dy', (dy + e.clientY - startY) + 'px');
+    });
+    function end(e) {
+      if (!dragging) return;
+      dragging = false;
+      card.classList.remove('dragging');
+      const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+      if (dist < 6) {
+        // treat as a click → flip; undo the tiny live offset
+        card.style.setProperty('--dx', dx + 'px');
+        card.style.setProperty('--dy', dy + 'px');
+        card.classList.toggle('flipped');
+      } else {
+        dx += e.clientX - startX;
+        dy += e.clientY - startY;
+      }
+    }
+    card.addEventListener('pointerup', end);
+    card.addEventListener('pointercancel', end);
+  })();
+
+  /* ── Nokia: drag with momentum glide, bounded to the frame ── */
+  (function glideNokia() {
+    const el = document.getElementById('nokia');
+    const frame = document.querySelector('.main');
+    if (!el || !frame) return;
+    let dx = 0, dy = 0, startX = 0, startY = 0, downX = 0, downY = 0, dragging = false;
+    let lastX = 0, lastY = 0, lastT = 0, vx = 0, vy = 0, raf = 0;
+
+    function apply() {
+      el.style.setProperty('--dx', dx + 'px');
+      el.style.setProperty('--dy', dy + 'px');
+    }
+    // keep the phone inside the frame; returns which edges were hit
+    function clampToFrame() {
+      apply();
+      const m = frame.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      let hitX = false, hitY = false;
+      if (r.left < m.left)        { dx += m.left - r.left;     hitX = true; }
+      else if (r.right > m.right) { dx += m.right - r.right;   hitX = true; }
+      if (r.top < m.top)          { dy += m.top - r.top;       hitY = true; }
+      else if (r.bottom > m.bottom){ dy += m.bottom - r.bottom; hitY = true; }
+      if (hitX || hitY) apply();
+      return { hitX, hitY };
+    }
+
+    el.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      downX  = e.clientX; downY  = e.clientY;
+      lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
+      vx = vy = 0;
+      cancelAnimationFrame(raf);
+      el.classList.add('dragging');
+      el.setPointerCapture(e.pointerId);
+    });
+
+    el.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const now = performance.now();
+      const dt = Math.max(now - lastT, 1);
+      vx = (e.clientX - lastX) / dt * 16;
+      vy = (e.clientY - lastY) / dt * 16;
+      lastX = e.clientX; lastY = e.clientY; lastT = now;
+      dx += e.clientX - startX; dy += e.clientY - startY;
+      startX = e.clientX; startY = e.clientY;
+      clampToFrame();
+    });
+
+    function end(e) {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      // tap (not drag) → ring
+      if (e && Math.hypot(e.clientX - downX, e.clientY - downY) < 6) {
+        nokiaRing();
+        return;
+      }
+      const max = 45;
+      vx = Math.max(-max, Math.min(max, vx));
+      vy = Math.max(-max, Math.min(max, vy));
+      const friction = 0.92, bounce = -0.55;
+      (function glide() {
+        vx *= friction; vy *= friction;
+        dx += vx; dy += vy;
+        const hit = clampToFrame();
+        if (hit.hitX) vx *= bounce;
+        if (hit.hitY) vy *= bounce;
+        if (Math.abs(vx) > 0.15 || Math.abs(vy) > 0.15) {
+          raf = requestAnimationFrame(glide);
+        }
+      })();
+    }
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    window.addEventListener('resize', clampToFrame);
+
+    function nokiaRing() {
+      if (el.dataset.ringing === '1') return;
+      el.dataset.ringing = '1';
+      el.src = 'NokiaCa.png';
+
+      const sfx = new Audio('Nk2.mp3');
+      sfx.addEventListener('ended', () => {
+        el.src = 'Nokia.png';
+        el.dataset.ringing = '0';
+      });
+      sfx.play().catch(() => {
+        // autoplay blocked — still restore image after a reasonable delay
+        setTimeout(() => { el.src = 'Nokia.png'; el.dataset.ringing = '0'; }, 3500);
+      });
+    }
+  })();
+
+</script>
+</body>
+</html>
