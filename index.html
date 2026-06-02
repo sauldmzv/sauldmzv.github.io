@@ -1255,79 +1255,84 @@
     /* ════════════════ MOBILE / PORTRAIT ════════════════ */
     @media (max-width: 760px) {
 
-      /* ── Layout: thin CSS binder strip, no image ── */
+      /* ── Layout: thin CSS binder strip ── */
       .binder {
-        width: 14px;
-        background: linear-gradient(to right, #a0a0a0, #d0d0d0 40%, #b0b0b0);
+        width: 12px;
+        background: linear-gradient(to right, #999, #ccc 50%, #aaa);
       }
       .binder img { display: none; }
-      .main { margin-left: 14px; }
+      .main { margin-left: 12px; }
 
-      /* ── Hero ── */
-      .content { height: 100svh; overflow: hidden; }
+      /* ── Hero: shorter so card isn't lost in whitespace ── */
+      .content { height: 72svh; overflow: hidden; }
 
-      /* ID card: width-driven so it fills the screen without distortion */
+      /* ID card */
       .card-wrap {
-        --ch: 52vw;
-        top: 46vh;
-        left: calc(50% + 7px);   /* account for half the binder width */
+        --ch: 46vw;
+        top: 36vh;
+        left: calc(50% + 6px);
       }
 
-      /* Nokia: sit below-right of card */
+      /* Nokia: below the card, clear of it */
       .nokia {
-        width: 18vw;
-        left: 76%;
-        top: 64vh;
+        width: 20vw;
+        left: 68%;
+        top: 68vh;
       }
 
-      /* Hide all decorative props */
-      .props .stamp-red,
-      .props .stamp-black,
-      .props .stamp-circle,
-      .props .redact,
-      .props .stain,
-      .props .ref { display: none; }
+      /* Password: move to left so it doesn't land on the card photo */
+      .pw {
+        top: 1.6vh;
+        left: 3vw;
+        right: auto;
+        align-items: flex-start;
+      }
+      .pw-btn     { font-size: 4vw; }
+      .pw-input   { font-size: 3.5vw; width: 34vw; }
+      .pw-confirm { font-size: 3.5vw; }
+
+      /* Hide decorative props */
+      .props .stamp-red, .props .stamp-black,
+      .props .stamp-circle, .props .redact,
+      .props .stain, .props .ref { display: none; }
 
       /* ── Archives ── */
-      .archives { padding: 7vh 0 9vh; overflow: hidden; }
+      .archives { padding: 7vh 0 9vh; }
       .archives-title { font-size: 9vw; letter-spacing: 0.1em; }
-      .archives-sub   { font-size: 3.6vw; margin-bottom: 4vh; }
+      .archives-sub   { font-size: 3.8vw; margin-bottom: 4vh; }
       .archives-rule  { width: 70vw; margin-bottom: 5vh; }
 
-      /* Tray: vertical 2×3 grid — width accounts for binder */
-      /* available = 100vw - 14px binder; tray = 90% of that  */
+      /* Tray: CSS grid — 2 columns, reliable on all mobile browsers */
       .archives-tray {
-        width: calc(92vw - 14px);
+        width: 88vw;
         aspect-ratio: unset;
-        background: #dcdcdc;
-        border: 1px solid #c8c8c8;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4vw;
+        padding: 5vw;
+        background: #d8d8d8;
+        border: 1px solid #c2c2c2;
         border-radius: 16px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 4vw 3vw;
-        padding: 5vw 4vw 6vw;
         box-shadow:
-          inset 0 8px 22px rgba(0,0,0,0.16),
-          inset 0 -4px 12px rgba(0,0,0,0.09),
+          inset 0 8px 22px rgba(0,0,0,0.15),
+          inset 0 -4px 12px rgba(0,0,0,0.08),
           inset 4px 0 12px rgba(0,0,0,0.07),
           inset -4px 0 12px rgba(0,0,0,0.07);
       }
       .archives-tray::before { content: none; }
       .archives-tray::after  { content: none; }
 
-      /* Flatten rows into a single 2-column grid */
-      .tray-row { display: contents; }
-
-      /* Polaroids: 2 per row
-         tray inner = (92vw - 14px) - 8vw padding = (84vw - 14px)
-         two polaroids + gap: 2×39vw + 3vw = 81vw  →  fits  */
-      .polaroid {
-        width: 39vw;
-        transition: transform 0.28s cubic-bezier(.2,.8,.3,1);
+      /* Each row becomes a grid subgrid — 2 items side by side */
+      .tray-row {
+        display: contents;
       }
-      .polaroid .caption { font-size: 4vw; bottom: 2vw; }
+
+      /* Polaroids fill their grid cell */
+      .polaroid {
+        width: 100%;
+        transition: transform 0.25s ease;
+      }
+      .polaroid .caption { font-size: 4.2vw; bottom: 2vw; }
 
       /* Reset all rotations */
       .tray-row:nth-child(1) .polaroid:nth-child(1),
@@ -1338,43 +1343,37 @@
       .tray-row:nth-child(2) .polaroid:nth-child(3) { transform: none; }
       .polaroid:hover { transform: scale(1.03) !important; }
 
-      /* Tape strips */
-      .tape { width: 11vw; height: 2.6vw; top: -1.4vw; }
+      /* Tape */
+      .tape { width: 12vw; height: 3vw; top: -1.6vw; }
 
-      /* Locked ? size */
-      .polaroid.locked .photo::after { font-size: 6vw; }
+      /* Locked ? */
+      .polaroid.locked .photo::after { font-size: 7vw; }
 
       /* ── Lightbox ── */
-      .lb-card  { width: 94vw; padding: 3vw 3vw 5vw; }
+      .lb-card  { width: 94vw; padding: 3vw; }
       .lb-title { font-size: 7vw; margin-top: 3vw; }
       .lb-role  { font-size: 3vw; }
       .lb-desc  { font-size: 3.4vw; line-height: 1.6; }
       .lb-close { top: 2vh; right: 3vw; width: 9vw; height: 9vw; font-size: 5vw; line-height: 9vw; }
 
       /* ── Contact ── */
-      .contact { padding: 9vh 5vw 12vh; }
-      .contact-eyebrow { font-size: 3.5vw; }
+      .contact { padding: 8vh 5vw 12vh; }
+      .contact-eyebrow { font-size: 3.8vw; }
       .contact-title   { font-size: 13vw; }
       .contact-links   { flex-direction: column; gap: 2.5vh; width: 100%; }
       .contact-link    { font-size: 5vw; justify-content: center; width: 90vw; }
       .contact-link svg { width: 6vw; height: 6vw; }
-      .contact-foot    { font-size: 3.2vw; margin-top: 6vh; }
+      .contact-foot    { font-size: 3.2vw; margin-top: 5vh; }
 
-      /* ── Music player ── */
+      /* ── Music ── */
       .music-ctrl { bottom: 2vh; right: 3vw; gap: 2vw; }
       .vol        { width: 20vw; }
       .music-btn  { width: 12vw; height: 12vw; }
       .music-btn svg { width: 5.5vw; height: 5.5vw; }
       .vinyl      { width: 24vw; height: 24vw; margin-left: -12vw; }
 
-      /* ── Password gate ── */
-      .pw         { top: 1.8vh; right: 3vw; }
-      .pw-btn     { font-size: 4vw; }
-      .pw-input   { font-size: 3.5vw; width: 32vw; letter-spacing: 0.15em; }
-      .pw-confirm { font-size: 3.5vw; padding: 0.6vh 2vw; }
-
       /* ── Misc ── */
-      .scroll-cue { font-size: 3.2vw; left: 50%; }
+      .scroll-cue { font-size: 3.5vw; }
       .runes      { gap: 6vw; font-size: 13vw; }
     }
   </style>
