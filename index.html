@@ -1255,25 +1255,29 @@
     /* ════════════════ MOBILE / PORTRAIT ════════════════ */
     @media (max-width: 760px) {
 
-      /* ── Layout: hide binder on mobile, full width content ── */
-      .binder { display: none; }
-      .main   { margin-left: 0; }
+      /* ── Layout: thin CSS binder strip, no image ── */
+      .binder {
+        width: 14px;
+        background: linear-gradient(to right, #a0a0a0, #d0d0d0 40%, #b0b0b0);
+      }
+      .binder img { display: none; }
+      .main { margin-left: 14px; }
 
       /* ── Hero ── */
       .content { height: 100svh; overflow: hidden; }
 
-      /* ID card: sized to fit portrait screen */
+      /* ID card: width-driven so it fills the screen without distortion */
       .card-wrap {
-        --ch: 44vw;
+        --ch: 52vw;
         top: 46vh;
-        left: 50%;
+        left: calc(50% + 7px);   /* account for half the binder width */
       }
 
       /* Nokia: sit below-right of card */
       .nokia {
         width: 18vw;
-        left: 74%;
-        top: 62vh;
+        left: 76%;
+        top: 64vh;
       }
 
       /* Hide all decorative props */
@@ -1290,36 +1294,40 @@
       .archives-sub   { font-size: 3.6vw; margin-bottom: 4vh; }
       .archives-rule  { width: 70vw; margin-bottom: 5vh; }
 
-      /* Tray: vertical 2×3 grid with a tray-like container */
+      /* Tray: vertical 2×3 grid — width accounts for binder */
+      /* available = 100vw - 14px binder; tray = 90% of that  */
       .archives-tray {
-        width: 92vw;
+        width: calc(92vw - 14px);
         aspect-ratio: unset;
-        background: #f0f0f0;
-        border-radius: 18px;
+        background: #dcdcdc;
+        border: 1px solid #c8c8c8;
+        border-radius: 16px;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
         align-items: flex-start;
-        gap: 5vw 3vw;
-        padding: 6vw 4vw 7vw;
+        gap: 4vw 3vw;
+        padding: 5vw 4vw 6vw;
         box-shadow:
-          inset 0 6px 18px rgba(0,0,0,0.13),
-          inset 0 -3px 10px rgba(0,0,0,0.07),
-          inset 3px 0 10px rgba(0,0,0,0.06),
-          inset -3px 0 10px rgba(0,0,0,0.06);
+          inset 0 8px 22px rgba(0,0,0,0.16),
+          inset 0 -4px 12px rgba(0,0,0,0.09),
+          inset 4px 0 12px rgba(0,0,0,0.07),
+          inset -4px 0 12px rgba(0,0,0,0.07);
       }
-      .archives-tray::before,
-      .archives-tray::after { display: none; }
+      .archives-tray::before { content: none; }
+      .archives-tray::after  { content: none; }
 
       /* Flatten rows into a single 2-column grid */
       .tray-row { display: contents; }
 
-      /* Polaroids: 2 per row, evenly sized */
+      /* Polaroids: 2 per row
+         tray inner = (92vw - 14px) - 8vw padding = (84vw - 14px)
+         two polaroids + gap: 2×39vw + 3vw = 81vw  →  fits  */
       .polaroid {
-        width: 44vw;
+        width: 39vw;
         transition: transform 0.28s cubic-bezier(.2,.8,.3,1);
       }
-      .polaroid .caption { font-size: 4.2vw; bottom: 2.2vw; }
+      .polaroid .caption { font-size: 4vw; bottom: 2vw; }
 
       /* Reset all rotations */
       .tray-row:nth-child(1) .polaroid:nth-child(1),
