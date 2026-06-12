@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Portfolio</title>
+  <title>Saul Martinez — Archives</title>
+  <meta name="description" content="Portfolio of Saul Danilo Martinez Zavala — Economics student from Guayaquil, Ecuador. Selected work in video, marketing, and cross-cultural storytelling." />
+  <meta name="author" content="Saul Danilo Martinez Zavala" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:title" content="Saul Martinez — Archives" />
+  <meta property="og:description" content="An Economics student that sometimes has time to share his memories. Selected work, for the record." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sauldmzv.github.io/" />
+  <meta property="og:image" content="https://sauldmzv.github.io/photoai.jpg" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%82%EF%B8%8F%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
@@ -11,6 +20,7 @@
     @font-face {
       font-family: 'OldNewspaper';
       src: url('OldNewspaperTypes.ttf') format('truetype');
+      font-display: swap;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,6 +30,25 @@
       width: 100%;
       background: #ffffff;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* selection + keyboard focus in the handwriting-ink blue */
+    ::selection { background: #1f3fa0; color: #fff; }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 2px dashed #1f3fa0;
+      outline-offset: 3px;
+    }
+
+    /* visually hidden, still read by screen readers / search engines */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .layout {
@@ -153,9 +182,9 @@
       z-index: -1;
     }
     /* rows sit above the ::before image layer */
-    .tray-row { position: relative; z-index: 1; }
     .tray-row {
       position: relative;
+      z-index: 1;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -514,7 +543,6 @@
       border: 1px solid rgba(70,80,88,0.4);
     }
     .lb-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .lb-photo iframe { width: 100%; height: 100%; border: 0; }
     .lb-photo iframe { width: 100%; height: 100%; border: 0; }
     .lb-title {
       font-family: 'Caveat', cursive;
@@ -1252,8 +1280,10 @@
       display: inline-block;
     }
 
-    /* ════════════════ MOBILE / PORTRAIT ════════════════ */
-    @media (max-width: 760px) {
+    /* ════════════════ MOBILE / PORTRAIT / TABLET ════════════════
+       Portrait-only: the default (desktop) layout sizes the card in vh and
+       is built for landscape; portrait phones & tablets get this layout. */
+    @media (max-width: 1024px) and (orientation: portrait) {
 
       /* ── Layout: thin CSS binder strip ── */
       .binder {
@@ -1269,15 +1299,16 @@
       /* ID card */
       .card-wrap {
         --ch: 46vw;
-        top: 36vh;
+        top: 32vh;
         left: calc(50% + 6px);
       }
 
-      /* Nokia: below the card, clear of it */
+      /* Nokia: tucked in the gap below the card, sitting above the
+         scroll cue and well clear of the ARCHIVES heading below */
       .nokia {
-        width: 20vw;
-        left: 68%;
-        top: 68vh;
+        width: 16vw;
+        left: 58%;
+        top: 54vh;
       }
 
       /* Password: move to left so it doesn't land on the card photo */
@@ -1332,7 +1363,10 @@
         width: 100%;
         transition: transform 0.25s ease;
       }
-      .polaroid .caption { font-size: 4.2vw; bottom: 2vw; }
+      /* Thicker bottom band so the handwritten caption sits cleanly
+         below the photo instead of spilling onto it */
+      .polaroid .paper { padding: 1.4vw 1.4vw 7vw; }
+      .polaroid .caption { font-size: 3.8vw; bottom: 1.8vw; }
 
       /* Reset all rotations */
       .tray-row:nth-child(1) .polaroid:nth-child(1),
@@ -1376,6 +1410,26 @@
       .scroll-cue { font-size: 3.5vw; }
       .runes      { gap: 6vw; font-size: 13vw; }
     }
+
+    /* ════════════════ TABLET (taller aspect — refine hero) ════════════════
+       The card is sized in vw but the hero is spaced in vh; on a tall tablet
+       the phone-card stack would otherwise collide. Shrink + retune here. */
+    @media (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+      .card-wrap {
+        --ch: 34vw;
+        top: 26vh;
+      }
+      .nokia {
+        width: 12vw;
+        left: 58%;
+        top: 50vh;
+      }
+      /* a touch smaller so the hero reads calmly on the wider canvas */
+      .archives-title { font-size: 7vw; }
+      .archives-sub   { font-size: 2.8vw; }
+      .contact-title  { font-size: 10vw; }
+      .contact-link   { font-size: 3.4vw; width: 70vw; }
+    }
   </style>
 </head>
 <body class="is-loading">
@@ -1390,7 +1444,7 @@
 </div>
 
 <!-- background music -->
-<audio id="bgm" src="audio1.mp3" loop preload="auto"></audio>
+<audio id="bgm" src="audio1.mp3" loop preload="none"></audio>
 <div class="music-ctrl">
   <span class="vinyl"><img src="vinyl.png" alt="" /></span>
   <input id="vol" class="vol" type="range" min="0" max="1" step="0.001" value="0.002" aria-label="Volume" />
@@ -1416,6 +1470,7 @@
   <div class="main">
 
   <div class="content">
+    <h1 class="sr-only">Saul Danilo Martinez Zavala — Portfolio &amp; Selected Work</h1>
     <div class="scroll-cue" id="scrollCue">
       <span>Scroll</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -1429,7 +1484,7 @@
 
     <!-- photo -->
     <div class="card-photo">
-      <img src="photoai.jpg" alt="" />
+      <img src="photoai.jpg" alt="Black-and-white portrait of Saul Danilo Martinez Zavala" />
     </div>
 
     <div class="card-body">
@@ -1503,7 +1558,7 @@
           <div class="tape"></div>
           <div class="paper">
             <div class="photo">
-              <img src="https://img.youtube.com/vi/YjRn-Q7uBrg/maxresdefault.jpg" alt="" />
+              <img src="https://img.youtube.com/vi/YjRn-Q7uBrg/maxresdefault.jpg" alt="Project 01 — video still" loading="lazy" decoding="async" />
             </div>
             <div class="caption">Project 01</div>
           </div>
@@ -1571,8 +1626,8 @@
   </section>
 
   <!-- project lightbox -->
-  <div class="lightbox" id="lightbox">
-    <button class="lb-close" type="button">✕</button>
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Project details">
+    <button class="lb-close" type="button" aria-label="Close">✕</button>
     <div class="lb-card">
       <div class="lb-photo">Photo</div>
       <div class="lb-title"></div>
@@ -1611,7 +1666,10 @@
   (function loader() {
     const el = document.getElementById('loader');
     if (!el) return;
-    const MIN = 2200;                 // keep the runes on screen at least this long
+    // full rune intro on first visit; quick fade on repeat visits this session
+    let seen = false;
+    try { seen = sessionStorage.getItem('seenLoader') === '1'; sessionStorage.setItem('seenLoader', '1'); } catch (_) {}
+    const MIN = seen ? 500 : 2200;    // keep the runes on screen at least this long
     const start = performance.now();
     function done() {
       const wait = Math.max(0, MIN - (performance.now() - start));
@@ -1750,10 +1808,12 @@
         photoEl.innerHTML = img ? '<img src="' + img.src + '" alt="">' : 'Photo';
       }
       lb.classList.add('open');
+      document.body.style.overflow = 'hidden';   // lock page scroll behind the dialog
     }
     function close() {
       lb.classList.remove('open');
       photoEl.innerHTML = '';   // stop any playing video
+      document.body.style.overflow = '';
     }
 
     document.querySelectorAll('.polaroid.expandable').forEach((p) => {
